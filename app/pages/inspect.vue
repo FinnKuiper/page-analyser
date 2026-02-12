@@ -8,16 +8,23 @@ const error = ref(null);
 async function getSiteData() {
     loading.value = true;
     error.value = null;
+
     try {
-        data.value = await $fetch(`/api/inspect?url=${url}`);
+        const res = await $fetch('/api/inspect', { query: { url } });
+        data.value = res;
     } catch (e) {
-        error.value = e?.message ?? "Failed to analyse page";
+        console.error(e);
+        const anyErr = e;
+        error.value =
+            anyErr?.data?.message ??
+            anyErr?.message ??
+            'Failed to analyse page';
     } finally {
         loading.value = false;
     }
 }
 
-onMounted(() => getSiteData());
+getSiteData();
 </script>
 
 <template>
@@ -35,7 +42,8 @@ onMounted(() => getSiteData());
                 <h2>Summary</h2>
                 <ul class="summary">
                     <li><strong>{{ data.headingOrder.summary.total }}</strong> headings</li>
-                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ? "present" : "missing" }})</li>
+                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ? "present" :
+                        "missing" }})</li>
                     <li v-for="(count, level) in data.headingOrder.summary.byLevel" :key="level">
                         H{{ level }}: {{ count }}
                     </li>
@@ -60,24 +68,30 @@ onMounted(() => getSiteData());
     margin: 0 auto;
     padding: 1.5rem;
 }
+
 .meta {
     color: var(--text-color);
     opacity: 0.85;
     margin-bottom: 1.5rem;
 }
+
 .analysis {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+
 .analysis h2 {
     font-size: 1.1rem;
     margin: 1rem 0 0.25rem;
 }
-.summary, .issues {
+
+.summary,
+.issues {
     list-style: disc;
     padding-left: 1.5rem;
 }
+
 .outline {
     background: var(--secondary);
     padding: 1rem;
@@ -86,9 +100,11 @@ onMounted(() => getSiteData());
     white-space: pre-wrap;
     font-size: 0.9rem;
 }
+
 .issues li {
     color: #c45;
 }
+
 .ok {
     color: #3a7;
 }
