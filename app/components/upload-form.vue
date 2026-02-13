@@ -15,6 +15,9 @@ const handleSubmit = () => {
         errorMessage.value = 'Please enter a URL';
         return;
     }
+    if (!form.value.url.startsWith('http://') && !form.value.url.startsWith('https://')) {
+        form.value.url = `https://${form.value.url}`;
+    }
     errorMessage.value = '';
     router.push(`/inspect?url=${form.value.url}`);
 };
@@ -22,7 +25,9 @@ const handleSubmit = () => {
 
 <template>
     <form class="upload-form" @submit.prevent="handleSubmit">
-        <input name="inspecting url" type="url" placeholder="https://example.com" v-model="form.url" />
+        <input name="inspecting url"
+            pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"
+            placeholder="https://example.com" v-model="form.url" />
         <Button>Search</Button>
     </form>
 </template>
