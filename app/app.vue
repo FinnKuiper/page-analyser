@@ -1,7 +1,9 @@
 <template>
   <div class="app">
     <NuxtRouteAnnouncer />
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 
@@ -11,10 +13,6 @@ import '~/assets/global.css'
 
 <style scoped>
 .app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   height: 100vh;
 }
 </style>
