@@ -22,28 +22,27 @@ const handleSubmit = () => {
 
 <template>
     <form class="upload-form" @submit.prevent="handleSubmit">
-        <h1>Upload Form</h1>
         <input name="inspecting url" type="url" placeholder="https://example.com" v-model="form.url" />
-        {{ errorMessage ? errorMessage : '' }}
-        <Button>Check site</Button>
+        <Button>Search</Button>
     </form>
 </template>
 
 <style scoped>
 .upload-form {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 16rem;
     gap: 1rem;
+    background-color: white;
+    border-radius: 1rem;
+    padding: 0.5rem;
 }
 
 input {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.2rem;
     border-radius: 1rem;
-    border: 1px solid var(--secondary);
+    border: none;
     background-color: white;
     color: var(--text-color);
     font-size: 1rem;
