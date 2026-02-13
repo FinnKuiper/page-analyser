@@ -1,4 +1,6 @@
 <script setup>
+import { ExternalLink } from 'lucide-vue-next';
+
 const route = useRoute();
 const url = route.query.url;
 const data = ref(null);
@@ -32,17 +34,39 @@ getSiteData();
         <template v-if="loading">Analysing heading order from Bright Data…</template>
         <template v-else-if="error">{{ error }}</template>
         <template v-else-if="data">
-            <h1>Heading order analysis</h1>
-            <p class="meta">
-                Source: <strong>{{ data.url }}</strong>
-                <span v-if="data.title"> · {{ data.title }}</span>
-            </p>
+            <h1 style="color: var(--text-color); margin-bottom: 1rem;">Analysis report</h1>
+            <main>
+                <div class="site-info">
+                    <img :src="`https://s2.googleusercontent.com/s2/favicons?domain=${data.url}`" alt="Site icon"
+                        class="site-icon" />
+                    <div class="site-details">
+                        <h2>{{ data.title }}</h2>
+                        <a :href="`${data.url}`" target="_blank"><span>{{ data.url }}</span>
+                            <ExternalLink size="16" />
+                        </a>
+                    </div>
+                </div>
+                <div class="site-iframe-container">
+                    <iframe :src="data.url" frameborder="0" class="site-iframe"></iframe>
+                    <section class="site-score">
+                        <header class="site-score-header">
+                            <h2>Overall score</h2>
+                        </header>
+                        <div class="horizontal-rule"></div>
+                        <div class="site-score-content">
+                            <span style="font-size: 2rem; font-weight: 600;">80%</span>
+                            <span>total score</span>
+                        </div>
+                    </section>
+                </div>
+            </main>
 
             <section v-if="data.headingOrder" class="analysis">
                 <h2>Summary</h2>
                 <ul class="summary">
                     <li><strong>{{ data.headingOrder.summary.total }}</strong> headings</li>
-                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ? "present" :
+                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ?
+                        "present" :
                         "missing" }})</li>
                     <li v-for="(count, level) in data.headingOrder.summary.byLevel" :key="level">
                         H{{ level }}: {{ count }}
@@ -63,49 +87,100 @@ getSiteData();
 </template>
 
 <style scoped>
+* {
+    color: white;
+}
+
 .inspect {
-    max-width: 42rem;
-    margin: 0 auto;
-    padding: 1.5rem;
+    width: 100%;
+    padding: 1rem;
 }
 
-.meta {
-    color: var(--text-color);
-    opacity: 0.85;
-    margin-bottom: 1.5rem;
+.horizontal-rule {
+    width: 100%;
+    height: 2px;
+    background-color: #713369;
+    margin-block: 1rem;
 }
 
-.analysis {
+main {
+    background-color: #171717;
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 100%;
+}
+
+.site-iframe-container {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     gap: 1rem;
 }
 
-.analysis h2 {
-    font-size: 1.1rem;
-    margin: 1rem 0 0.25rem;
+.site-iframe {
+    width: 1080px;
+    height: 540px;
+    border: none;
+    border-radius: 1rem;
 }
 
-.summary,
-.issues {
-    list-style: disc;
-    padding-left: 1.5rem;
+.site-score {
+    width: 16rem;
+    border-radius: 1rem;
+    padding-block: 1rem;
+    background-color: #863c7c;
 }
 
-.outline {
-    background: var(--secondary);
-    padding: 1rem;
+.site-score-header {
+    padding-inline: 1rem;
+}
+
+.site-score-content {
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.site-info {
+    display: flex;
+
+    h2 {
+        margin-top: -0.2rem;
+    }
+}
+
+.site-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.site-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem;
+    transition: all 0.2s ease;
+    width: fit-content;
+
+    svg {
+        stroke: none;
+        transition: all 0.2s ease;
+    }
+}
+
+a:hover {
+    background-color: #272727;
     border-radius: 0.5rem;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    font-size: 0.9rem;
-}
 
-.issues li {
-    color: #c45;
-}
-
-.ok {
-    color: #3a7;
+    svg {
+        stroke: white;
+    }
 }
 </style>

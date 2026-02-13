@@ -18,11 +18,13 @@ export default defineEventHandler(async (event) => {
         const response = await axios.get(targetUrl);
         const $ = load(response.data);
         const title = $("title").text();
+        const icon = $("[rel='icon']").text();
         const headingOrder = analyseHeadingOrder($);
-
+        console.log(icon);
         return {
             url: targetUrl,
             title,
+            icon,
             headingOrder,
         };
     } catch (err: any) {

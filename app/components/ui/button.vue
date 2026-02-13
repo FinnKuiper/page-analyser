@@ -12,5 +12,6 @@ button {
     padding: 10px 20px;
     border-radius: 2rem;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 </style>
