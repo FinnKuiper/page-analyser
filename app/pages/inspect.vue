@@ -34,16 +34,23 @@ getSiteData();
         <template v-if="loading">Analysing heading order from Bright Data…</template>
         <template v-else-if="error">{{ error }}</template>
         <template v-else-if="data">
-            <h1 style="color: var(--text-color); margin-left: 1rem;">Analysis report</h1>
+            <h1 style="color: var(--text-color); margin-bottom: 1rem;">Analysis report</h1>
             <main>
                 <div class="site-info">
                     <img :src="`https://s2.googleusercontent.com/s2/favicons?domain=${data.url}`" alt="Site icon"
                         class="site-icon" />
                     <div class="site-details">
                         <h2>{{ data.title }}</h2>
-                        <a href="{{ data.url }}" target="_blank"><span>{{ data.url }}</span>
+                        <a :href="`${data.url}`" target="_blank"><span>{{ data.url }}</span>
                             <ExternalLink size="16" />
                         </a>
+                    </div>
+                </div>
+                <div class="site-iframe-container">
+                    <iframe :src="data.url" frameborder="0" class="site-iframe"></iframe>
+                    <div class="site-score">
+                        <h2>Overall score</h2>
+                        <p>80</p>
                     </div>
                 </div>
             </main>
@@ -83,12 +90,35 @@ getSiteData();
     padding: 1rem;
 }
 
-.site-info {
-    display: flex;
+main {
     background-color: #171717;
     padding: 1rem;
     border-radius: 1rem;
     width: 100%;
+}
+
+.site-iframe-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.site-iframe {
+    width: 1080px;
+    height: 540px;
+    border: none;
+    border-radius: 1rem;
+}
+
+.site-score {
+    width: 16rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #863c7c;
+}
+
+.site-info {
+    display: flex;
 
     h2 {
         margin-top: -0.2rem;

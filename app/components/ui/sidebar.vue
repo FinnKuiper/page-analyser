@@ -34,8 +34,9 @@ header {
 .sidebar {
     display: flex;
     flex-direction: column;
-    width: 16rem;
-    padding: 1rem;
+    width: 14rem;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
     padding-top: 0;
     background-color: #2b2b2b;
 
