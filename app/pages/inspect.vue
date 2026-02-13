@@ -48,10 +48,16 @@ getSiteData();
                 </div>
                 <div class="site-iframe-container">
                     <iframe :src="data.url" frameborder="0" class="site-iframe"></iframe>
-                    <div class="site-score">
-                        <h2>Overall score</h2>
-                        <p>80</p>
-                    </div>
+                    <section class="site-score">
+                        <header class="site-score-header">
+                            <h2>Overall score</h2>
+                        </header>
+                        <div class="horizontal-rule"></div>
+                        <div class="site-score-content">
+                            <span style="font-size: 2rem; font-weight: 600;">80%</span>
+                            <span>total score</span>
+                        </div>
+                    </section>
                 </div>
             </main>
 
@@ -90,6 +96,13 @@ getSiteData();
     padding: 1rem;
 }
 
+.horizontal-rule {
+    width: 100%;
+    height: 2px;
+    background-color: #713369;
+    margin-block: 1rem;
+}
+
 main {
     background-color: #171717;
     padding: 1rem;
@@ -113,8 +126,19 @@ main {
 .site-score {
     width: 16rem;
     border-radius: 1rem;
-    padding: 1rem;
+    padding-block: 1rem;
     background-color: #863c7c;
+}
+
+.site-score-header {
+    padding-inline: 1rem;
+}
+
+.site-score-content {
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .site-info {
