@@ -13,21 +13,25 @@ export async function analyseHeadingsContent(headings: HeadingItem[]) {
         }
     });
 
+    const headingsList = headings.map(h => `H${h.level}: ${h.text}`).join(" | ");
+
     const prompt = `
-        You are a Media Psychologist. Analyze these website headings for:
-        1. Cognitive Load (Hick's Law)
-        2. Benefit Framing (Self-relevance)
-        3. Anxiety Triggers (Trust)
+You are a Media Psychologist. Analyze these website headings for:
+1. Cognitive Load (Hick's Law)
+2. Benefit Framing (Self-relevance)
+3. Anxiety Triggers (Trust)
 
-        Headings: ${headings.join(' | ')}
+Headings: ${headingsList}
 
-        Return a JSON object with:
-        {
-        "score": number,
-        "summary": "string",
-        "critique": [{ "heading": "string", "issue": "string", "fix": "string", "psych_principle": "string" }]
-        }
-    `
+Return a JSON object with:
+{
+  "score": number,
+  "summary": "string",
+  "critique": [
+    { "heading": "string", "issue": "string", "fix": "string", "psych_principle": "string" }
+  ]
+}
+    `;
 
     try {
         const response = await openai.chat.completions.create({
