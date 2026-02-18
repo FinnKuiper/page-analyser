@@ -3,7 +3,7 @@ import { CheckResult, computeScore, createChecklist, setCheck } from "./checklis
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-interface HeadingItem {
+export interface HeadingItem {
     level: HeadingLevel;
     text: string;
     index: number;
@@ -57,6 +57,7 @@ export function analyseHeadingOrder($: ReturnType<typeof load>): HeadingOrderAna
         setCheck(checks, "page-has-a-title", true);
         setCheck(checks, "page-has-a-single-h1", true);
     };
+
 
     return {
         headings,

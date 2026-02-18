@@ -60,6 +60,26 @@ getSiteData();
                         </div>
                     </section>
                 </div>
+                <div class="site-content-analysis">
+                    <header class="site-content-analysis-header">
+                        <h2>Content analysis</h2>
+                    </header>
+                    <div class="horizontal-rule"></div>
+                    <div class="site-content-analysis-content">
+                        <span style="font-size: 2rem; font-weight: 600;">{{ data.contentAnalysis.score }}%</span>
+                        <span>total score</span>
+                    </div>
+                    <div class="site-content-analysis-critique">
+                        <ul>
+                            <li v-for="critique in data.contentAnalysis.critique" :key="critique.heading">
+                                <span>{{ critique.heading }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="site-content-analysis-summary">
+                        <p>{{ data.contentAnalysis.summary }}</p>
+                    </div>
+                </div>
             </main>
 
         </template>

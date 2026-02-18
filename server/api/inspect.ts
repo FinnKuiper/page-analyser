@@ -2,6 +2,7 @@ import { load } from "cheerio";
 import axios from "axios";
 import { createError } from "h3";
 import { analyseHeadingOrder } from "./utils/analyse-heading-order";
+import { analyseHeadingsContent } from "./utils/AI/analyse-heading-content";
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -20,12 +21,14 @@ export default defineEventHandler(async (event) => {
         const title = $("title").text();
         const icon = $("[rel='icon']").text();
         const headingOrder = analyseHeadingOrder($);
-        console.log(icon);
+        const contentAnalysis = await analyseHeadingsContent(headingOrder.headings);
+        console.log(contentAnalysis);
         return {
             url: targetUrl,
             title,
             icon,
             headingOrder,
+            contentAnalysis,
         };
     } catch (err: any) {
         throw createError({
