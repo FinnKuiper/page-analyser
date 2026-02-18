@@ -14,6 +14,7 @@ async function getSiteData() {
     try {
         const res = await $fetch('/api/inspect', { query: { url } });
         data.value = res;
+        console.log(data.value.headingOrder.checklist);
     } catch (e) {
         console.error(e);
         const anyErr = e;
@@ -54,34 +55,13 @@ getSiteData();
                         </header>
                         <div class="horizontal-rule"></div>
                         <div class="site-score-content">
-                            <span style="font-size: 2rem; font-weight: 600;">80%</span>
+                            <span style="font-size: 2rem; font-weight: 600;">{{ data.headingOrder.score }}%</span>
                             <span>total score</span>
                         </div>
                     </section>
                 </div>
             </main>
 
-            <section v-if="data.headingOrder" class="analysis">
-                <h2>Summary</h2>
-                <ul class="summary">
-                    <li><strong>{{ data.headingOrder.summary.total }}</strong> headings</li>
-                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ?
-                        "present" :
-                        "missing" }})</li>
-                    <li v-for="(count, level) in data.headingOrder.summary.byLevel" :key="level">
-                        H{{ level }}: {{ count }}
-                    </li>
-                </ul>
-
-                <h2>Outline (document order)</h2>
-                <pre class="outline">{{ data.headingOrder.outline }}</pre>
-
-                <h2>Issues</h2>
-                <ul v-if="data.headingOrder.issues.length" class="issues">
-                    <li v-for="(issue, i) in data.headingOrder.issues" :key="i">{{ issue }}</li>
-                </ul>
-                <p v-else class="ok">No heading order issues detected.</p>
-            </section>
         </template>
     </div>
 </template>
