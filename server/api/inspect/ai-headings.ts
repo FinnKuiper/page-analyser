@@ -1,7 +1,8 @@
 import { load } from "cheerio";
 import axios from "axios";
 import { createError } from "h3";
-import { analyseHeadingOrder } from "./utils/analyse-heading-order";
+import { analyseHeadingOrder } from "../utils/analyse-heading-order";
+import { analyseHeadingsContent } from "../utils/AI/analyse-heading-content";
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -17,19 +18,14 @@ export default defineEventHandler(async (event) => {
     try {
         const response = await axios.get(targetUrl);
         const $ = load(response.data);
-        const title = $("title").text();
-        const icon = $("[rel='icon']").text();
         const headingOrder = analyseHeadingOrder($);
-        return {
-            url: targetUrl,
-            title,
-            icon,
-            headingOrder,
-        };
+        const contentAnalysis = await analyseHeadingsContent(headingOrder.headings);
+
+        return contentAnalysis;
     } catch (err: any) {
         throw createError({
             statusCode: err?.response?.status ?? 500,
-            statusMessage: err?.response?.statusText ?? "Failed to fetch target URL",
+            statusMessage: err?.response?.statusText ?? "Failed to fetch target URL or analyse content",
             data: {
                 message: err?.message,
                 status: err?.response?.status,
@@ -39,3 +35,4 @@ export default defineEventHandler(async (event) => {
         });
     }
 });
+

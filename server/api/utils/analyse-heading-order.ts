@@ -1,8 +1,9 @@
 import { load } from "cheerio";
+import { CheckResult, computeScore, createChecklist, setCheck } from "./checklist";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-interface HeadingItem {
+export interface HeadingItem {
     level: HeadingLevel;
     text: string;
     index: number;
@@ -10,8 +11,8 @@ interface HeadingItem {
 
 interface HeadingOrderAnalysis {
     headings: HeadingItem[];
-    outline: string;
-    issues: string[];
+    checklist: CheckResult[];
+    score: number;
     summary: {
         total: number;
         byLevel: Record<string, number>;
@@ -24,7 +25,7 @@ export function analyseHeadingOrder($: ReturnType<typeof load>): HeadingOrderAna
     const headingTags = ["h1", "h2", "h3", "h4", "h5", "h6"];
     const headings: HeadingItem[] = [];
     const byLevel: Record<string, number> = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
-    const issues: string[] = [];
+    const checks = createChecklist();
 
     $("body")
         .find(headingTags.join(","))
@@ -36,30 +37,32 @@ export function analyseHeadingOrder($: ReturnType<typeof load>): HeadingOrderAna
             const text = $(el).text().trim();
             headings.push({ level, text, index });
             byLevel[String(level)] = (byLevel[String(level)] ?? 0) + 1;
+            setCheck(checks, "using-headers-to-structure-content", true);
         });
 
-    // Build outline and detect order issues
-    let outline = "";
+    // check if page is using a correct heading order
     let prevLevel = 0;
     for (let i = 0; i < headings.length; i++) {
         const item = headings[i]!;
-        const { level, text } = item;
-        const indent = "  ".repeat(level - 1);
-        outline += `${indent}H${level}: ${text || "(empty)"}\n`;
-
-        if (level > prevLevel && level - prevLevel > 1)
-            issues.push(`Heading skip: H${prevLevel} → H${level} at position ${i + 1} ("${text.slice(0, 40)}${text.length > 40 ? "…" : ""}")`);
+        const { level } = item;
+        if (level > prevLevel && level - prevLevel > 1) {
+            setCheck(checks, "headers-in-correct-order", false);
+        }
         prevLevel = level;
+        setCheck(checks, "headers-in-correct-order", true);
     }
 
     const h1Count = byLevel["1"] ?? 0;
-    if (h1Count === 0) issues.push("Page has no H1.");
-    else if (h1Count > 1) issues.push(`Page has ${h1Count} H1(s). Consider a single H1 per page.`);
+    if (h1Count === 1) {
+        setCheck(checks, "page-has-a-title", true);
+        setCheck(checks, "page-has-a-single-h1", true);
+    };
+
 
     return {
         headings,
-        outline: outline.trim() || "(no headings found)",
-        issues,
+        checklist: checks,
+        score: computeScore(checks),
         summary: {
             total: headings.length,
             byLevel,

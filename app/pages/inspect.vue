@@ -6,6 +6,9 @@ const url = route.query.url;
 const data = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const aiData = ref(null);
+const aiLoading = ref(false);
+const aiError = ref(null);
 
 async function getSiteData() {
     loading.value = true;
@@ -14,6 +17,7 @@ async function getSiteData() {
     try {
         const res = await $fetch('/api/inspect', { query: { url } });
         data.value = res;
+        loadAiInsights();
     } catch (e) {
         console.error(e);
         const anyErr = e;
@@ -27,6 +31,25 @@ async function getSiteData() {
 }
 
 getSiteData();
+
+async function loadAiInsights() {
+    aiLoading.value = true;
+    aiError.value = null;
+
+    try {
+        const res = await $fetch('/api/inspect/ai-headings', { query: { url } });
+        aiData.value = res;
+    } catch (e) {
+        console.error(e);
+        const anyErr = e;
+        aiError.value =
+            anyErr?.data?.message ??
+            anyErr?.message ??
+            'Failed to analyse headings content';
+    } finally {
+        aiLoading.value = false;
+    }
+}
 </script>
 
 <template>
@@ -54,34 +77,48 @@ getSiteData();
                         </header>
                         <div class="horizontal-rule"></div>
                         <div class="site-score-content">
-                            <span style="font-size: 2rem; font-weight: 600;">80%</span>
+                            <span style="font-size: 2rem; font-weight: 600;">{{ data.headingOrder.score }}%</span>
                             <span>total score</span>
                         </div>
                     </section>
                 </div>
+                <div class="site-content-analysis">
+                    <header class="site-content-analysis-header">
+                        <h2>Content analysis</h2>
+                    </header>
+                    <div class="horizontal-rule"></div>
+                    <template v-if="aiLoading">
+                        <div class="site-content-analysis-loading">
+                            Analysing headings content with AI…
+                        </div>
+                    </template>
+                    <template v-else-if="aiError">
+                        <div class="site-content-analysis-error">
+                            {{ aiError }}
+                        </div>
+                    </template>
+                    <template v-else-if="aiData">
+                        <div class="site-content-analysis-content">
+                            <span style="font-size: 2rem; font-weight: 600;">{{ aiData.score }}%</span>
+                            <span>total score</span>
+                        </div>
+                        <div class="site-content-analysis-critique">
+                            <ul>
+                                <li v-for="critique in aiData.critique" :key="critique.heading">
+                                    <span>{{ critique.heading }}</span>
+                                    <span>{{ critique.issue }}</span>
+                                    <span>{{ critique.fix }}</span>
+                                    <span>{{ critique.psych_principle }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="site-content-analysis-summary">
+                            <p>{{ aiData.summary }}</p>
+                        </div>
+                    </template>
+                </div>
             </main>
 
-            <section v-if="data.headingOrder" class="analysis">
-                <h2>Summary</h2>
-                <ul class="summary">
-                    <li><strong>{{ data.headingOrder.summary.total }}</strong> headings</li>
-                    <li>H1: {{ data.headingOrder.summary.h1Count }} ({{ data.headingOrder.summary.hasH1 ?
-                        "present" :
-                        "missing" }})</li>
-                    <li v-for="(count, level) in data.headingOrder.summary.byLevel" :key="level">
-                        H{{ level }}: {{ count }}
-                    </li>
-                </ul>
-
-                <h2>Outline (document order)</h2>
-                <pre class="outline">{{ data.headingOrder.outline }}</pre>
-
-                <h2>Issues</h2>
-                <ul v-if="data.headingOrder.issues.length" class="issues">
-                    <li v-for="(issue, i) in data.headingOrder.issues" :key="i">{{ issue }}</li>
-                </ul>
-                <p v-else class="ok">No heading order issues detected.</p>
-            </section>
         </template>
     </div>
 </template>
